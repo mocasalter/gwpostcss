@@ -1,0 +1,32 @@
+.soc-links {
+	margin-top: 20px;
+}
+
+.soc-link {
+	$size: 47px;
+	$radius: 50%;
+	
+	background: $blue;
+	border-radius: $radius;
+	display: inline-block;
+	height: $size;
+	width: $size;
+	text-align: center;
+	vertical-align: middle;
+	position: relative;	
+	margin-left: 10px;
+
+	&:first-of-type {
+		margin-left: 0;
+	}
+
+	@include link-states {
+		background: $blue-dark;
+	}
+}
+
+.soc-link_icon {
+	@include centerer;
+	position: absolute;
+	z-index: 1;
+}

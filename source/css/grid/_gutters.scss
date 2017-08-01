@@ -1,0 +1,17 @@
+.gutter {
+	padding-left: $gutter-sm;
+	padding-right: $gutter-sm;
+	@include mq($break-sm) {
+		padding-left: $gutter;
+		padding-right: $gutter;
+	}
+}
+
+.gutter-sm {
+	padding-left: 10px;
+	padding-right: 10px;
+	@include mq($break-sm) {
+		padding-left: $gutter-sm;
+		padding-right: $gutter-sm;
+	}
+}

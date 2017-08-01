@@ -1,0 +1,41 @@
+a {
+  color: $blue;
+  text-decoration: none;
+  &:hover, &:focus {
+  	/* color: $blue-dark; */
+  	text-decoration: underline;
+  }
+}
+
+.icon-link {
+  @include horizontal-group;
+  img {
+    margin-right: 10px;
+  }
+}
+
+.skip-nav {
+	@include visually-hidden;
+	transform: translate(0,-40px);
+	opacity: 0;
+	/* transition: transform $transition-short, opacity $transition-short;*/
+	width: 100%;
+	left: 0;
+	&:focus {
+		color: #fff;
+		transform: translate(0,0);
+		opacity: 1;
+        height: auto;
+        top: -1px;
+        display: block;
+        overflow: auto;
+        clip: auto;
+        z-index: 50;
+        text-align: center;
+        text-decoration: none;
+        padding: 10px;
+        background-color: #000;
+        font-weight: 700;
+        outline: none;
+    }
+}

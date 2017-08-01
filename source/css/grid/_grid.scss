@@ -1,0 +1,47 @@
+$grid-side-padding: 4.5%;
+
+@mixin grid-cell-left-pad {
+  padding-left: $grid-side-padding;
+  &:first-of-type {
+    padding-left: 0;
+  }
+}
+
+@mixin grid-cell-right-pad {
+  padding-right: $grid-side-padding;
+  &:last-of-type {
+    padding-right: 0;
+  }
+}
+
+.grid {
+  @include float-clear;
+}
+
+.grid-cell {
+  float: left;
+  margin-bottom: 20px;
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+@include mq(200px) {
+
+  .md-grid-cell {
+    @include grid-cell-right-pad;
+    margin: 0;
+    &.has-left-pad {
+      @include grid-cell-left-pad;
+    }
+  }
+
+  .md-grid-cell--1of3 {
+    width: $third;
+  }
+
+  .md-grid-cell--2of3 {
+    width: calc($third * 2);
+  }
+
+}

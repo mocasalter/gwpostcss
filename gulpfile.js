@@ -1,33 +1,46 @@
 var gulp = require('gulp'),
     gulpUtil = require('gulp-util'),
     gulpCopy = require('gulp-copy'),
+    sassGlob = require('gulp-sass-glob'),
+    imagemin = require('gulp-imagemin'),
+    sass = require('gulp-sass'),
+    sourcemaps = require('gulp-sourcemaps'),
     uglify = require('gulp-uglify'),
     svgSprite = require('gulp-svg-sprite'),
     svgSymbols = require('gulp-svg-symbols'),
-    imagemin = require('gulp-imagemin'),
-    postcss = require('gulp-postcss'),
-        simpleVars = require('postcss-simple-vars'),
-        cssImport = require('postcss-easy-import'),
-        nested = require('postcss-nested'),
-        calc = require('postcss-calc'),
-        mixins = require('postcss-mixins'),
-        extend = require('postcss-extend'),
-        colors = require('postcss-color-function'),
-        autoprefixer = require('autoprefixer'),
-        mdcss = require('mdcss'),
-        cssmqpacker = require('css-mqpacker'),
-        csswring = require('csswring'),
+    cssImport = require('css-import'),
+    cssmqpacker = require('css-mqpacker'),
+    csswring = require('csswring'),
     pngquant = require('imagemin-pngquant'),
     del = require('del'),
     runSequence = require('run-sequence'),
-    browserSync = require('browser-sync').create();
+    browserSync = require('browser-sync').create(),
+    reload = browserSync.reload;
+
+
+
+
+
+/*------------------------------------*\
+  #OPTIONS
+\*------------------------------------*/
 
 var paths = {
-    css: 'source/css/**/*.css',
-    images: 'source/images/*',
-    sprites: 'source/svg-sprites/*.svg',
-    icons: 'source/svg-icons/*.svg',
-    js: 'source/js/*.js'
+    source: {
+      styles: './source/css/**/*.scss',
+      images: './source/images/*',
+      sprites: './source/svg-sprites/*.svg',
+      icons: './source/svg-icons/*.svg',
+      scripts: './source/js/*.js',
+      patterns: ['./pattern-library/**/*.html', './pattern-library/**/*.md', './pattern-library/data.json',],
+    },
+    dist: {
+      styles: './dist/css',
+      images: './dist/images',
+      sprites: './dist/images',
+      icons: './dist/images',
+      scripts: './dist/js',
+    }
 };
 
 var spriteConfig = {
@@ -52,7 +65,14 @@ var spriteConfig = {
     }
 };
 
-/* Handle CSS build breaking the watch task */ 
+
+
+
+
+/*------------------------------------*\
+  #ERRORS
+\*------------------------------------*/
+
 function onError(err) {
   console.log(err.toString());
   if (watching) {
@@ -63,41 +83,49 @@ function onError(err) {
 }
 
 
-gulp.task('serve', ['css'], function() {
-    // for running local drupal 
-    // browserSync.init({
-    //     port: 8888,
-    //     open: 'external',
-    //     host: "YOURPROJECT.dev",
-    //     proxy: "http://YOURPROJECT.dev:8888"
-    // });
 
-    // for mdcss styleguide
-    browserSync.init({
-      server: "./source/styleguide"
-    })
 
-    gulp.watch(paths.css, ['css']);
-    gulp.watch("./source/styleguide/index.html").on('change', browserSync.reload);
+/*------------------------------------*\
+  #Images
+\*------------------------------------*/
+
+gulp.task('images', function(callback) {
+  runSequence('clean-images', 'imagemin', callback);
 });
 
-// run all image tasks
-gulp.task('build-images', function(callback) {
-  runSequence('clean-images', ['imagemin', 'sprites'], 'copy-images', callback);
-});
 // get rid of old images
 gulp.task('clean-images', function() {
-    return del(['./dist/images']);
+    return del([ paths.dist.images ]);
 });
-// build sprites
+
+// minify images
+gulp.task('imagemin', function () {
+   return gulp.src(paths.source.images)
+      .pipe(imagemin({
+          progressive: true,
+          svgoPlugins: [{removeViewBox: false}],
+          use: [pngquant()]
+      }))
+      .pipe(gulp.dest(paths.dist.images));
+});
+
+
+
+
+
+/*------------------------------------*\
+  #SVGS
+\*------------------------------------*/
+
 gulp.task('sprites', function() {
-    return gulp.src(paths.sprites)
+    return gulp.src(paths.source.sprites)
         .pipe(svgSprite(spriteConfig))
         .pipe(gulp.dest(''));
 });
+
 // build svg shapes
 gulp.task('shapes', function () {
-  return gulp.src(paths.icons)
+  return gulp.src(paths.source.icons)
     .pipe(svgSymbols({
         templates: ['default-svg'],
         title: '%f',
@@ -105,76 +133,82 @@ gulp.task('shapes', function () {
             return name.toLowerCase().trim().replace(/\s/g, '-');
         }
     }))
-    .pipe(gulp.dest('dist/images'));
-});
-// minify images
-gulp.task('imagemin', function () {
-   return gulp.src(paths.images)
-        .pipe(imagemin({
-            progressive: true,
-            svgoPlugins: [{removeViewBox: false}],
-            use: [pngquant()]
-        }))
-        .pipe(gulp.dest('./dist/images'));
-});
-// copy images into styleguide
-gulp.task('copy-images', function() {
-  return gulp.src('./dist/images/**/*')
-        .pipe(gulpCopy('./source/styleguide/dist'))
-        .pipe(gulp.dest('./source/styleguide'));
+    .pipe(gulp.dest(paths.dist.images));
 });
 
-// JS minify
-gulp.task('js', function() {
-  return gulp.src(paths.js)
+
+
+
+
+/*------------------------------------*\
+  #SCRIPTS
+\*------------------------------------*/
+
+gulp.task('scripts', function() {
+  return gulp.src(paths.source.scripts)
     .pipe(uglify().on('error', onError))
-    .pipe(gulp.dest('./dist/js'));
+    .pipe(gulp.dest('./pattern-library/assets/js'))
+    .pipe(gulp.dest(paths.dist.scripts));
 });
 
-// CSS Process
-gulp.task('css', function () {
-    const options = {
-        browsers: ['last 2 versions', 'IE 10'], flexbox: 'no-2009'
-    };
 
-    // preprocessor order matters!
-    const plugins = [
-        cssImport({glob:'true'}),
-        mixins,
-        nested,
-        simpleVars,
-        colors,
-        extend,
-        calc,
-        mdcss({
-            theme: require('mdcss-theme-github'),
-            destination: './source/styleguide',
-            // !!! Don't use the mdcss assets option to move css to the styleguide folder. 
-            // It will move the css before it's done compiling.
-            assets: ['./dist/images'],
-            examples: ({
-                css: ['./dist/css/style.css']
-            })
-        }),
-        cssmqpacker({sort: true}),
-        autoprefixer({browsers: options.browsers}),
-        csswring({map: false})
-    ];
-    return gulp.src('./source/css/*.css')
-        .pipe(postcss(plugins).on('error', onError))
-        .pipe(gulp.dest('./dist/css'))
-        // copy into the styleguide
-        .pipe(gulp.dest('./source/styleguide/dist/css'))
-        .pipe(browserSync.stream());
+
+
+
+/*------------------------------------*\
+  #SERVER
+\*------------------------------------*/
+
+gulp.task('serve', ['styles'], function() {
+    browserSync.init({
+        server: './pattern-library'
+    });
+
+    gulp.watch(paths.source.styles, ['styles']).on('change', reload);
+    gulp.watch(paths.source.patterns).on('change', reload);
 });
+
+
+
+
+
+/*------------------------------------*\
+  #STYLES
+\*------------------------------------*/
+
+gulp.task('styles', function () {
+    return gulp.src(paths.source.styles)
+      .pipe(sourcemaps.init()) // Start source maps
+      .pipe(sassGlob())
+      .pipe(sass({outputStyle: 'compressed'}).on('error', sass.logError))
+      .pipe(sourcemaps.write('/')) // Finish source maps
+      .pipe(gulp.dest(paths.dist.styles))
+      .pipe(gulp.dest('./pattern-library/assets/css'))
+      .pipe(reload({ stream: true }));
+});
+
+
+
+
+
+/*------------------------------------*\
+  #WATCH
+\*------------------------------------*/
 
 gulp.task('watch', function() {
-    // not including css watch because it's already in the serve task
     watching = true;
-    gulp.watch(paths.js, ['js']);
-    gulp.watch(paths.icons, ['shapes']);
-    gulp.watch([paths.images, paths.sprites], ['build-images']);
+    gulp.watch(paths.source.styles, ['styles']);
+    gulp.watch(paths.source.scripts, ['scripts']);
+    gulp.watch(paths.source.icons, ['shapes']);
+    gulp.watch([paths.source.images, paths.source.sprites], ['images']);
 });
 
+
+
+
+
+/*------------------------------------*\
+  #DEFAULT
+\*------------------------------------*/
+
 gulp.task('default', ['serve', 'watch']);
-// 'build-images', 'css', 'js', 

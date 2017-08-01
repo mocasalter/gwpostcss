@@ -1,0 +1,67 @@
+.flex-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
+/* makes cells equal height */
+.flex-grid--flexcells {  
+  > .flex-grid-cell {
+    display: flex; 
+  }
+}
+
+.flex-grid-cell {
+  flex: 0 0 100%;
+  /* IE 10 fallback */
+  width: 100%;
+  max-width: 100%;
+}
+
+.lg-flex-grid--1of4 {
+  > .flex-grid-cell {
+    flex: 0 0 50%;
+    /* IE 10 fallback */
+    width: 50%;
+    max-width: 50%;
+  }
+}
+
+@include mq($break-md) {
+  
+  .lg-flex-grid--1of4,
+  .md-flex-grid--1of2 {
+    > .flex-grid-cell {
+      flex: 0 0 50%;
+      /* IE 10 fallback */
+      width: 50%;
+      max-width: 50%;
+    }
+  }
+
+  /* first cell can't grow in width, second can */
+  .md-flex-grid--1of2-first-static {
+    flex-wrap: nowrap;
+    > .flex-grid-cell:first-child {
+      flex: 0 1 auto;
+    }
+    > .flex-grid-cell:last-child {
+      flex: 1 1 auto;
+    }
+  }
+
+}
+
+@include mq($break-lg) {
+  
+  .lg-flex-grid--1of4 {
+    > .flex-grid-cell {
+      flex: 0 0 25%;
+      /* IE 10 fallback */
+      width: 25%;
+      max-width: 25%;
+    }
+  }
+
+}

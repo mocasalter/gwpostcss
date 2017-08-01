@@ -1,0 +1,28 @@
+h1 { font-size: $ts-h1; }
+h2 { font-size: $ts-h2; }
+h3 { font-size: $ts-h3; }
+h4 { font-size: $ts-h4; }
+h5 { font-size: $ts-h5; }
+h6 { font-size: $ts-h6; }
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  color: $text-color;
+  font-weight: 500;
+  a {
+    text-decoration: none;
+  }
+}
+
+h2 {
+  margin: ($text-margin * 2) 0 $text-margin;
+}
+
+h3, h4, h5, h6 {
+  margin: $text-margin 0;
+}
+
+.YOUR-HEADING {
+  font-family: $font-secondary;
+  color: $blue;
+}

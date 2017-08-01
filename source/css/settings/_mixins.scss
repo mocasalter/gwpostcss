@@ -1,0 +1,40 @@
+/* media queries */
+@mixin mq ($break) {
+  @media (min-width: $break) { @content; }
+}
+
+@mixin mq-max ($break) {
+  @media (max-width: $break) { @content; }
+}
+
+/* image related */
+@mixin image-replace {
+  display: block;
+  text-indent: 50%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@mixin visually-hidden {
+  position: absolute !important;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
+  clip-path: inset(1px 1px 1px 1px);
+}
+
+@mixin pseudo-absolute {
+  position: absolute;
+  content: '';
+  display: inline-block;
+}
+
+/* lists */
+@mixin plain-list {
+  margin: 0;
+  padding: 0;
+  li {
+   margin: 0;
+   list-style: none;
+  }
+}

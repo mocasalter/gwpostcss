@@ -1,0 +1,12 @@
+/* containers */
+@mixin container {
+  width: 100%;
+  margin: 0 auto;
+  @include float-clear;
+}
+
+.container {
+  @include container;
+  max-width: $max-width;
+}
+

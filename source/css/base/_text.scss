@@ -1,0 +1,22 @@
+address {
+  font-style: normal;
+}
+
+blockquote{
+}
+
+hr {
+  height: 1px;
+  border: none;
+  background: gray;
+  margin: ($text-margin * 2) 0;
+}
+
+.text-meta {
+	text-transform: uppercase;
+	font-size: 1.5rem;
+}
+
+.text-bold {
+	font-weight: 700;
+}

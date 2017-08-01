@@ -1,0 +1,12 @@
+@mixin link-states {
+    &:hover, &:focus, &:active {
+        @content;
+    }
+}
+
+@mixin white-link {
+	color: #fff;
+    &:hover, &:focus, &:active {
+        color: #fff;
+    }
+}
