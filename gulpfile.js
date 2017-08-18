@@ -56,8 +56,8 @@ var spriteConfig = {
           dest: './',
           sprite: 'dist/images/sprites.svg',
           render: {
-              css: {
-                  dest: './source/css/base/_sprites.css',
+              scss: {
+                  dest: './source/css/base/_sprites.scss',
                   template: './source/svg-sprites/sprites.css'
               }
           }
